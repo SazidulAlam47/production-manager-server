@@ -11,7 +11,6 @@ const productSchema = new Schema<TProduct>(
             type: String,
             required: true,
             trim: true,
-            unique: true,
         },
         plannedQuantity: {
             type: Number,
