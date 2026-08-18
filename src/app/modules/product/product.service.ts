@@ -18,6 +18,15 @@ const getProductById = async (productId: string) => {
 };
 
 const createProduct = async (payload: TProduct) => {
+    const existingProduct = await Product.findOne({
+        productName: payload.productName,
+    });
+    if (existingProduct) {
+        throw new ApiError(
+            status.CONFLICT,
+            'Product with this name already exists',
+        );
+    }
     const result = await Product.create(payload);
     return result;
 };
