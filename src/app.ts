@@ -12,7 +12,10 @@ const app: Application = express();
 app.use(express.json());
 app.use(
     cors({
-        origin: [config.client_url as string],
+        origin: [
+            config.client_dev_url as string,
+            config.client_prod_url as string,
+        ],
         credentials: true,
     }),
 );
