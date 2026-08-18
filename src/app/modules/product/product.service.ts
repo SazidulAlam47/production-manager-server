@@ -1,5 +1,6 @@
 import status from 'http-status';
 import ApiError from '../../errors/ApiError';
+import { Barcode } from '../barcode/barcode.model';
 
 import { TProduct } from './product.interface';
 import { Product } from './product.model';
@@ -38,6 +39,8 @@ const deleteProduct = async (productId: string) => {
     if (!product) {
         throw new ApiError(status.NOT_FOUND, 'Product not found');
     }
+
+    await Barcode.deleteMany({ productId: product._id });
     const result = await Product.findByIdAndDelete(product._id);
     return result;
 };
