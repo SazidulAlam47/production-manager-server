@@ -1,6 +1,7 @@
 export type TProduct = {
     date: Date;
     productName: string;
-    productionPlan: number;
+    plannedQuantity: number;
+    productionQuantity: number;
     manufacturingOrder: string;
 };

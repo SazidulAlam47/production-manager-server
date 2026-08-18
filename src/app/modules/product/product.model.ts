@@ -11,10 +11,15 @@ const productSchema = new Schema<TProduct>(
             type: String,
             required: true,
             trim: true,
+            unique: true,
         },
-        productionPlan: {
+        plannedQuantity: {
             type: Number,
             required: true,
+        },
+        productionQuantity: {
+            type: Number,
+            default: 0,
         },
         manufacturingOrder: {
             type: String,
