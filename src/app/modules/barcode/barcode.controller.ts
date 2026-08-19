@@ -4,11 +4,12 @@ import sendResponse from '../../utils/sendResponse';
 import { BarcodeServices } from './barcode.service';
 
 const getAllBarcode = catchAsync(async (req, res) => {
-    const result = await BarcodeServices.getAllBarcode();
+    const result = await BarcodeServices.getAllBarcode(req.query);
     sendResponse(res, {
         statusCode: status.OK,
         message: 'Barcodes fetched successfully',
-        data: result,
+        meta: result.meta,
+        data: result.result,
     });
 });
 
@@ -26,11 +27,13 @@ const getBarcodeById = catchAsync(async (req, res) => {
 const getAllBarcodeByProductId = catchAsync(async (req, res) => {
     const result = await BarcodeServices.getAllBarcodeByProductId(
         req.params.productId as string,
+        req.query,
     );
     sendResponse(res, {
         statusCode: status.OK,
         message: 'Barcodes fetched successfully',
-        data: result,
+        meta: result.meta,
+        data: result.result,
     });
 });
 

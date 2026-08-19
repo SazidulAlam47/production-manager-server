@@ -1,19 +1,39 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 import status from 'http-status';
 import ApiError from '../../errors/ApiError';
 import { Barcode } from '../barcode/barcode.model';
 import { TProduct } from './product.interface';
 import { Product } from './product.model';
 import getDayRange from '../../utils/getDayRange';
+import QueryBuilder from '../../builder/QueryBuilder';
 
-const getAllProducts = async (query?: { date?: string }) => {
-    const filter: Record<string, any> = {};
+const getAllProducts = async (query: Record<string, unknown>) => {
+    let baseFilter = {};
     if (query?.date) {
-        const { startOfDay, endOfDay } = getDayRange(query.date);
-        filter.date = { $gte: startOfDay, $lte: endOfDay };
+        const { startOfDay, endOfDay } = getDayRange(query.date as string);
+        baseFilter = { date: { $gte: startOfDay, $lte: endOfDay } };
     }
-    const result = await Product.find(filter).sort({ date: -1, createdAt: -1 });
-    return result;
+
+    // Exclude date from query so QueryBuilder.filter() doesn't overwrite range filter
+    const sanitizedQuery = { ...query };
+    delete sanitizedQuery.date;
+
+    const productQuery = new QueryBuilder(
+        Product.find(baseFilter),
+        sanitizedQuery,
+    )
+        .search(['productName', 'manufacturingOrder'])
+        .filter()
+        .sort()
+        .paginate()
+        .fields();
+
+    const result = await productQuery.modelQuery;
+    const meta = await productQuery.countTotal();
+
+    return {
+        meta,
+        result,
+    };
 };
 
 const getProductById = async (productId: string) => {

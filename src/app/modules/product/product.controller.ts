@@ -8,7 +8,8 @@ const getAllProducts = catchAsync(async (req, res) => {
     sendResponse(res, {
         statusCode: status.OK,
         message: 'Products fetched successfully',
-        data: result,
+        meta: result.meta,
+        data: result.result,
     });
 });
 

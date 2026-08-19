@@ -3,15 +3,46 @@ import ApiError from '../../errors/ApiError';
 import { Barcode } from './barcode.model';
 import { TBarcode } from './barcode.interface';
 import { Product } from '../product/product.model';
+import QueryBuilder from '../../builder/QueryBuilder';
 
-const getAllBarcode = async () => {
-    const result = await Barcode.find();
-    return result;
+const getAllBarcode = async (query: Record<string, unknown>) => {
+    const barcodeQuery = new QueryBuilder(Barcode.find(), query)
+        .search(['barcode'])
+        .filter()
+        .sort()
+        .paginate()
+        .fields();
+
+    const result = await barcodeQuery.modelQuery;
+    const meta = await barcodeQuery.countTotal();
+
+    return {
+        meta,
+        result,
+    };
 };
 
-const getAllBarcodeByProductId = async (productId: string) => {
-    const result = await Barcode.find({ productId });
-    return result;
+const getAllBarcodeByProductId = async (
+    productId: string,
+    query: Record<string, unknown>,
+) => {
+    const barcodeQuery = new QueryBuilder(
+        Barcode.find({ productId }),
+        query,
+    )
+        .search(['barcode'])
+        .filter()
+        .sort()
+        .paginate()
+        .fields();
+
+    const result = await barcodeQuery.modelQuery;
+    const meta = await barcodeQuery.countTotal();
+
+    return {
+        meta,
+        result,
+    };
 };
 
 const getBarcodeById = async (barcodeId: string) => {
