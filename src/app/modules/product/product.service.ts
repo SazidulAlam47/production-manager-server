@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import status from 'http-status';
 import ApiError from '../../errors/ApiError';
 import { Barcode } from '../barcode/barcode.model';
@@ -5,8 +6,13 @@ import { TProduct } from './product.interface';
 import { Product } from './product.model';
 import getDayRange from '../../utils/getDayRange';
 
-const getAllProducts = async () => {
-    const result = await Product.find().sort({ date: -1, createdAt: -1 });
+const getAllProducts = async (query?: { date?: string }) => {
+    const filter: Record<string, any> = {};
+    if (query?.date) {
+        const { startOfDay, endOfDay } = getDayRange(query.date);
+        filter.date = { $gte: startOfDay, $lte: endOfDay };
+    }
+    const result = await Product.find(filter).sort({ date: -1, createdAt: -1 });
     return result;
 };
 
