@@ -12,6 +12,16 @@ const getAllProducts = catchAsync(async (req, res) => {
     });
 });
 
+const getDailySummary = catchAsync(async (req, res) => {
+    const { date } = req.query;
+    const result = await ProductServices.getDailySummary(date as string);
+    sendResponse(res, {
+        statusCode: status.OK,
+        message: 'Daily production summary fetched successfully',
+        data: result,
+    });
+});
+
 const getProductById = catchAsync(async (req, res) => {
     const result = await ProductServices.getProductById(
         req.params.productId as string,
@@ -57,6 +67,7 @@ const deleteProduct = catchAsync(async (req, res) => {
 
 export const ProductControllers = {
     getAllProducts,
+    getDailySummary,
     getProductById,
     createProduct,
     updateProduct,

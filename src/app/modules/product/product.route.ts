@@ -6,6 +6,7 @@ import { ProductValidations } from './product.validation';
 const router = express.Router();
 
 router.get('/', ProductControllers.getAllProducts);
+router.get('/daily-summary', ProductControllers.getDailySummary);
 router.get('/:productId', ProductControllers.getProductById);
 
 router.post(

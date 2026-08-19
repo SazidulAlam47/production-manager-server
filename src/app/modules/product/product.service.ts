@@ -18,6 +18,46 @@ const getProductById = async (productId: string) => {
     return product;
 };
 
+const getDailySummary = async (dateInput?: string) => {
+    const targetDate = dateInput || new Date();
+    const { startOfDay, endOfDay } = getDayRange(targetDate);
+
+    const result = await Product.aggregate([
+        {
+            $match: {
+                date: { $gte: startOfDay, $lte: endOfDay },
+            },
+        },
+        {
+            $group: {
+                _id: null,
+                totalPlannedQuantity: { $sum: '$plannedQuantity' },
+                totalProductionQuantity: { $sum: '$productionQuantity' },
+            },
+        },
+    ]);
+
+    const totals = result[0] || {
+        totalPlannedQuantity: 0,
+        totalProductionQuantity: 0,
+    };
+
+    const dateStr =
+        typeof targetDate === 'string'
+            ? targetDate
+            : new Date(targetDate).toISOString().split('T')[0];
+
+    return {
+        date: dateStr,
+        totalPlannedQuantity: totals.totalPlannedQuantity,
+        totalProductionQuantity: totals.totalProductionQuantity,
+        totalRemainingQuantity: Math.max(
+            0,
+            totals.totalPlannedQuantity - totals.totalProductionQuantity,
+        ),
+    };
+};
+
 const createProduct = async (payload: TProduct) => {
     const { startOfDay, endOfDay } = getDayRange(payload.date);
 
@@ -97,4 +137,5 @@ export const ProductServices = {
     deleteProduct,
     getAllProducts,
     getProductById,
+    getDailySummary,
 };
