@@ -42,6 +42,9 @@ class QueryBuilder<T> {
     }
 
     paginate() {
+        if (this.query?.limit === '0' || Number(this.query?.limit) === 0) {
+            return this;
+        }
         const page = Number(this.query?.page) || 1;
         const limit = Number(this.query?.limit) || 10;
         const skip = (page - 1) * limit;
@@ -60,13 +63,13 @@ class QueryBuilder<T> {
     async countTotal() {
         const totalQueries = this.modelQuery.getFilter();
         const total = await this.modelQuery.model.countDocuments(totalQueries);
-        const page = Number(this.query?.page) || 1;
         const limit = Number(this.query?.limit) || 10;
-        const totalPage = Math.ceil(total / limit);
+        const page = Number(this.query?.page) || 1;
+        const totalPage = limit > 0 ? Math.ceil(total / limit) : 1;
 
         return {
             page,
-            limit,
+            limit: limit > 0 ? limit : total,
             total,
             totalPage,
         };
